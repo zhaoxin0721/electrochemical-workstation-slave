@@ -1,0 +1,237 @@
+// #include "eis.h"
+// // #include "../drivers/impedance_ad594x.h"
+// #include "../drivers/bat_impedance.h"
+
+// #include <zephyr/kernel.h>
+// #include <zephyr/logging/log.h>
+// LOG_MODULE_REGISTER(elec_eis, LOG_LEVEL_INF);
+
+// static volatile bool working = false;
+// static elec_eis_config_t config = {
+//   .freq_begin = 10,
+//   .freq_end   = 10000,
+//   .sample_count = 100,
+//   .use_log    = true,
+//   .ac_volt    = 300.0f,
+// };
+
+
+// #define BATAPPBUFF_SIZE 512
+// static uint32_t AppBuff[BATAPPBUFF_SIZE];
+// static int  AD5940PlatformCfg(void);
+// static void AD5940BATStructInit(void);
+// static void elec_eis_loop();
+
+// int elec_eis_init()
+// {
+//   int err = AD5940PlatformCfg();
+//   if (err) { return -1; }
+//   // LOG_INF("AD5940BATStructInit");
+//   AD5940BATStructInit(); /* Configure your parameters in this function */
+  
+//   // LOG_INF("AppBATInit");
+//   AppBATInit(AppBuff, BATAPPBUFF_SIZE);    /* Initialize BAT application. Provide a buffer, which is used to store sequencer commands */
+//   // LOG_INF("AppBATCtrl#end");
+//   return 0;
+// }
+
+// int elec_eis_config(elec_eis_config_t config_)
+// {
+//   // copy
+//   config.freq_begin   = config_.freq_begin;
+//   config.freq_end     = config_.freq_end;
+//   config.sample_count = config_.sample_count;
+//   config.use_log      = config_.use_log;
+//   config.ac_volt      = config_.ac_volt;
+//   return 0;
+// }
+
+// int elec_eis_start()
+// {
+//   if (config.freq_begin < 1)    return -1;
+//   if (config.freq_end < 1)      return -2;
+//   if (config.sample_count < 1)  return -3;
+//   if (config.ac_volt < 1)       return -4;
+//   working = true;
+//   // new task:
+//   return elec_method_commit(&elec_eis_loop);
+// }
+
+// int elec_eis_stop()
+// {
+//   working = false;
+//   int err = elec_method_commit(NULL);
+//   LOG_INF("EIS stop, still working? %s", working ? "yes" : "no");
+//   return err;
+// }
+
+// bool elec_eis_is_working()
+// {
+//   return working;
+// }
+
+// // Implemention:
+
+// /* Initialize AD5940 basic blocks like clock */
+// static int32_t AD5940PlatformCfg(void)
+// {
+//   CLKCfg_Type clk_cfg;
+//   FIFOCfg_Type fifo_cfg;
+//   AGPIOCfg_Type gpio_cfg;
+//   /* Use hardware reset */
+//   AD5940_HWReset();
+//   /* Platform configuration */
+//   AD5940_Initialize();
+//   /* Step1. Configure clock */
+//   clk_cfg.ADCClkDiv = ADCCLKDIV_1;
+//   clk_cfg.ADCCLkSrc = ADCCLKSRC_HFOSC;
+//   clk_cfg.SysClkDiv = SYSCLKDIV_1;
+//   clk_cfg.SysClkSrc = SYSCLKSRC_HFOSC; //on battery board, there is a 32MHz crystal.
+//   clk_cfg.HfOSC32MHzMode = bFALSE;
+//   clk_cfg.HFOSCEn = bTRUE;
+//   clk_cfg.HFXTALEn = bFALSE;
+//   clk_cfg.LFOSCEn = bTRUE;
+//   AD5940_CLKCfg(&clk_cfg);
+//   /* Step2. Configure FIFO and Sequencer*/
+//   fifo_cfg.FIFOEn = bFALSE;
+//   fifo_cfg.FIFOMode = FIFOMODE_FIFO;
+//   fifo_cfg.FIFOSize = FIFOSIZE_4KB;                       /* 4kB for FIFO, The reset 2kB for sequencer */
+//   fifo_cfg.FIFOSrc = FIFOSRC_DFT;
+//   fifo_cfg.FIFOThresh = 4;//AppBATCfg.FifoThresh;        /* DFT result. One pair for RCAL, another for Rz. One DFT result have real part and imaginary part */
+//   AD5940_FIFOCfg(&fifo_cfg);                             /* Disable to reset FIFO. */
+//   fifo_cfg.FIFOEn = bTRUE;  
+//   AD5940_FIFOCfg(&fifo_cfg);                             /* Enable FIFO here */
+  
+//   /* Step3. Interrupt controller */
+//   AD5940_INTCCfg(AFEINTC_1, AFEINTSRC_ALLINT, bTRUE);           /* Enable all interrupt in Interrupt Controller 1, so we can check INTC flags */
+//   AD5940_INTCCfg(AFEINTC_0, AFEINTSRC_DATAFIFOTHRESH, bTRUE);   /* Interrupt Controller 0 will control GP0 to generate interrupt to MCU */
+//   AD5940_INTCClrFlag(AFEINTSRC_ALLINT);
+//   /* Step4: Reconfigure GPIO */
+//   gpio_cfg.FuncSet = GP0_INT|GP1_SLEEP|GP2_SYNC;
+//   gpio_cfg.InputEnSet = 0; // AGPIO_Pin2;
+//   gpio_cfg.OutputEnSet = AGPIO_Pin0|AGPIO_Pin1|AGPIO_Pin2;
+//   gpio_cfg.OutVal = 0;
+//   gpio_cfg.PullEnSet = 0;
+//   AD5940_AGPIOCfg(&gpio_cfg);
+//   AD5940_SleepKeyCtrlS(SLPKEY_UNLOCK);  /* Allow AFE to enter sleep mode. */
+//   return 0;
+// }
+
+// void AD5940BATStructInit(void)
+// {
+//   AppBATCfg_Type *pBATCfg;
+//   AppBATGetCfg(&pBATCfg);
+//   pBATCfg->SeqStartAddr = 0;
+//   pBATCfg->MaxSeqLen = 512;
+//   pBATCfg->RcalVal = 10000.0;  							/* Value of RCAL on EVAL-AD5941BATZ board is 50mOhm */
+//   pBATCfg->ACVoltPP = config.ac_volt; // 300.0f;							/* Pk-pk amplitude is 300mV */
+//   pBATCfg->DCVolt = 1200.0f;							/* Offset voltage of 1.2V*/
+//   pBATCfg->DftNum = DFTNUM_8192;
+  
+//   pBATCfg->FifoThresh = 2;      					/* 2 results in FIFO, real and imaginary part. */
+	
+// 	pBATCfg->SinFreq = 200;									/* Sin wave frequency. THis value has no effect if sweep is enabled */
+	
+// 	pBATCfg->SweepCfg.SweepEn = bTRUE;			/* Set to bTRUE to enable sweep function */
+// 	pBATCfg->SweepCfg.SweepStart = config.freq_begin; // 1.0f;		/* Start sweep at 1Hz  */
+// 	pBATCfg->SweepCfg.SweepStop = config.freq_end; // 50000.0f;	/* Finish sweep at 1000Hz */
+// 	pBATCfg->SweepCfg.SweepPoints = config.sample_count; // 50;			/* 100 frequencies in the sweep */
+// 	pBATCfg->SweepCfg.SweepLog = config.use_log ? bTRUE : bFALSE;			/* Set to bTRUE to use LOG scale. Set bFALSE to use linear scale */
+	
+// }
+
+// static volatile bool is_calibration = false;
+// void elec_eis_loop()
+// {
+//   LOG_INF("Loop Start.");
+//   uint8_t calib_signal[2];
+//   calib_signal[0] = 0xFD;
+//   calib_signal[1] = 0xFD;
+//   send_fac_stream_directly(calib_signal, 2);
+//   if (is_calibration) {
+//     return; // calibration is processing...
+//   }
+//   // 开始校准
+//   is_calibration = true;
+//   // LOG_INF("AppBATCtrl#BATCTRL_MRCAL");
+//   AppBATCtrl(BATCTRL_MRCAL, 0);     /* Measur RCAL each point in sweep */
+//   // LOG_INF("AppBATCtrl#BATCTRL_START");
+// 	AppBATCtrl(BATCTRL_START, 0);
+//   is_calibration = false;
+//   uint8_t start_signal[2];
+//   start_signal[0] = 0xFE;
+//   start_signal[1] = 0xFE;
+//   send_fac_stream_directly(start_signal, 2);
+//   k_msleep(5);
+//   send_fac_stream_directly(start_signal, 2);
+//   k_msleep(5);
+//   send_fac_stream_directly(start_signal, 2);
+//   k_msleep(5);
+//   uint32_t count;
+//   while(working)
+//   {
+//     if(AD5940_GetMCUIntFlag())
+//     {
+//       // LOG_INF("GPIO0 INT >>");
+//       AD5940_ClrMCUIntFlag();
+//       count = BATAPPBUFF_SIZE;
+//       AppBATISR(AppBuff, &count); 			/* Deal with it and provide a buffer to store data we got */
+//       AD5940_Delay10us(100000);
+//       // result
+//       fImpCar_Type *pImp = (fImpCar_Type*)AppBuff;
+//       float freq;
+//       AppBATCtrl(BATCTRL_GETFREQ, &freq);
+//       /*Process data*/
+//       for(int i=0;i<count;i++)
+//       {
+//         printk("Freq: %f :\n\t(real, image) = ,%f , %f (mOhm)\n", freq, pImp[i].Real, pImp[i].Image);
+//       }
+//       // 选取中间点为标准值
+//       int selected_index = count / 2;
+//       // buffer => protocal
+//       uint32_t freq_ = (uint32_t)(freq * 100);
+//       int64_t real = isnan(pImp[selected_index].Real) ? 0xFFFFFFFF : (int64_t)(pImp[selected_index].Real * 100);
+//       int64_t imag = isnan(pImp[selected_index].Image) ? 0xFFFFFFFF : (int64_t)(pImp[selected_index].Image * 100);
+//       uint8_t buffer[20];
+//       uint8_t index = 0;
+//       buffer[index++] = (uint8_t)(freq_ >> 24);
+//       buffer[index++] = (uint8_t)(freq_ >> 16);
+//       buffer[index++] = (uint8_t)(freq_ >> 8);
+//       buffer[index++] = (uint8_t)(freq_ & 0xFF);
+//       buffer[index++] = (uint8_t)(real >> 56);
+//       buffer[index++] = (uint8_t)(real >> 48);
+//       buffer[index++] = (uint8_t)(real >> 40);
+//       buffer[index++] = (uint8_t)(real >> 32);
+//       buffer[index++] = (uint8_t)(real >> 24);
+//       buffer[index++] = (uint8_t)(real >> 16);
+//       buffer[index++] = (uint8_t)(real >> 8);
+//       buffer[index++] = (uint8_t)(real & 0xFF);
+//       buffer[index++] = (uint8_t)(imag >> 56);
+//       buffer[index++] = (uint8_t)(imag >> 48);
+//       buffer[index++] = (uint8_t)(imag >> 40);
+//       buffer[index++] = (uint8_t)(imag >> 32);
+//       buffer[index++] = (uint8_t)(imag >> 24);
+//       buffer[index++] = (uint8_t)(imag >> 16);
+//       buffer[index++] = (uint8_t)(imag >> 8);
+//       buffer[index++] = (uint8_t)(imag & 0xFF);
+
+//       send_fac_stream_directly(buffer, 20);
+
+//       AD5940_SEQMmrTrig(SEQID_0);  		/* Trigger next measurement ussing MMR write*/      
+//       // break
+//       if (freq >= config.freq_end) {
+//         break;
+//       }
+//     }
+//     k_msleep(10);
+//   }
+//   LOG_INF("Loop End.");
+//   AppBATCtrl(BATCTRL_STOPNOW, 0);
+//   k_msleep(10);
+//   uint8_t stop_signal[2];
+//   stop_signal[0] = 0xFF;
+//   stop_signal[1] = 0xFF;
+//   send_fac_stream_directly(stop_signal, 2);
+//   elec_eis_stop();
+// }
+

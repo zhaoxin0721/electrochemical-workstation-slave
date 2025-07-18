@@ -1,0 +1,118 @@
+// Copyright (c) 2023 Nordic Semiconductor ASA
+// SPDX-License-Identifier: Apache-2.0
+
+/dts-v1/;
+#include <nordic/nrf52832_ciaa.dtsi>
+// #include "elechemical-nrf52832-pinctrl.dtsi"
+
+/ {
+	model = "elechemical-nrf52832";
+	compatible = "elechemical-nrf52832";
+  
+  aliases {
+    sw0 = &button0;
+    sw3 = &button3;
+  };
+	
+  chosen {
+		zephyr,sram = &sram0;
+		zephyr,flash = &flash0;
+		zephyr,code-partition = &slot0_partition;
+	};
+
+  buttons {
+    compatible = "gpio-keys";
+    button0: button_0 {
+			gpios = <&gpio0 0 (GPIO_PULL_UP | GPIO_ACTIVE_HIGH)>;
+      label = "AD5940 GPIO7 INT";
+    };
+    button3: button_3 {
+			gpios = <&gpio0 3 (GPIO_PULL_UP | GPIO_ACTIVE_HIGH)>;
+      label = "AD5940 GPIO0 INT";
+    };
+    /* ... other buttons ... */
+  };
+  
+};
+
+// &uart0 {
+// 	compatible = "nordic,nrf-uarte";
+// 	status = "okay";
+// 	current-speed = <115200>;
+// 	pinctrl-0 = <&uart0_default>;
+// 	pinctrl-1 = <&uart0_sleep>;
+// 	pinctrl-names = "default", "sleep";
+// };
+
+&gpiote {
+	status = "okay";
+};
+
+&gpio0 {
+	status = "okay";
+};
+
+&flash0 {
+	partitions {
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		boot_partition: partition@0 {
+			label = "mcuboot";
+			reg = <0x0 0xc000>;
+		};
+		slot0_partition: partition@c000 {
+			label = "image-0";
+			reg = <0xc000 0x32000>;
+		};
+		slot1_partition: partition@3e000 {
+			label = "image-1";
+			reg = <0x3e000 0x32000>;
+		};
+		scratch_partition: partition@70000 {
+			label = "image-scratch";
+			reg = <0x70000 0xa000>;
+		};
+		storage_partition: partition@7a000 {
+			label = "storage";
+			reg = <0x7a000 0x6000>;
+		};
+	};
+};
+
+
+&spi0 {
+  status = "okay";
+  max-frequency = <DT_FREQ_M(4)>;
+  pinctrl-0 = <&spi0_default>;
+  pinctrl-names = "default";
+  cs-gpios = <&gpio0 5 0>;
+};
+
+&spi1 {
+  status = "disabled";
+  max-frequency = <DT_FREQ_M(4)>;
+  cs-gpios = <&gpio0 5 0>;
+  pinctrl-0 = <&spi1_default>;
+  pinctrl-names = "default";
+};
+
+&pinctrl {
+  spi0_default: spi0_default {
+    group1 {
+      psels = <NRF_PSEL(SPIM_SCK, 0, 6)>,
+              <NRF_PSEL(SPIM_MOSI, 0, 12)>,
+              <NRF_PSEL(SPIM_MISO, 0, 8)>;
+    };
+  };
+
+  spi1_default: spi1_default {
+    group1 {
+      psels = <NRF_PSEL(SPIM_SCK, 0, 6)>,
+              <NRF_PSEL(SPIM_MOSI, 0, 12)>,
+              <NRF_PSEL(SPIM_MISO, 0, 8)>;
+      nordic,drive-mode = <NRF_DRIVE_H0S1>;
+    };
+  };
+};
