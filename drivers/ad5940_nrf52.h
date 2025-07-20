@@ -9,6 +9,6 @@
 #define AD5940_GPIO7            0
 #define AD5940_TEST_CS              11
 
-int  ad5940_spi_init();
+int  nrf52_spi_init();//ad5940改为nrf52
 
-int  ad5940_enable_int();
+int  nrf52_enable_int();//ad5940改为nrf52

@@ -7,7 +7,7 @@
 
 #include "../include/ble_protocal.h"
 #include "../include/ble_faca.h"
-#include "../drivers/ad5940_nrf52.h"
+#include "../drivers/nrf52_peripheral.h" //将#include "../drivers/ad5940_nrf52.h" 改为#include "../drivers/nrf52_peripheral.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(app, LOG_LEVEL_INF);
@@ -22,21 +22,21 @@ static struct bt_gatt_cb gatt_callbacks = {.att_mtu_updated = mtu_updated};
 void main(void)
 {
   int err = 0;
-  // AD5940
-  err = ad5940_spi_init();
+  // AD5940改成nrf52832
+  err = nrf52_spi_init();
   if (err)
   {
-    LOG_ERR("AD5940 SPI init failed (err %d)", err);
+    LOG_ERR("nrf52 SPI init failed (err %d)", err);
     return;
   }
 
-  err = ad5940_enable_int();
+  err = nrf52_enable_int();
   if (err)
   {
-    LOG_ERR("AD5940 INT init failed (err %d)", err);
+    LOG_ERR("nrf52 INT init failed (err %d)", err);
     return;
   }
-  LOG_INF("AD5940 init success.");
+  LOG_INF("nrf52 init success.");
 
   // Bluetooth
   err = bt_enable(NULL);

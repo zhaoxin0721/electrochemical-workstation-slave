@@ -22,13 +22,13 @@ static nrfx_spi_t spi = NRFX_SPI_INSTANCE(0);
 volatile static uint16_t    ucInterrupted = 0;      /* Flag to indicate interrupt occurred */
 volatile static uint16_t    ucIntCounter  = 0;      /* Repeat number */
 
-int  ad5940_spi_init()     // init pin
+int  nrf52_spi_init()     // init pin 已更改-nrf52
 {
   // gpio: reset
   nrf_gpio_cfg_output(AD5940_PIN_CS);
   nrf_gpio_cfg_output(AD5940_RESET);
-  AD5940_CsSet();
-  AD5940_RstSet();
+  nrf52_CsSet();
+  nrf52_RstSet();
   // spi
   nrfx_spi_config_t spi_config = NRFX_SPI_DEFAULT_CONFIG(
   AD5940_PIN_CLK,
@@ -48,7 +48,7 @@ void      AD5940_CsClr(void)    // set -> low
 {
     nrf_gpio_pin_clear(AD5940_PIN_CS);
 }
-void      AD5940_CsSet(void)    // set -> high
+void      nrf52_CsSet(void)    // set -> high
 {
     nrf_gpio_pin_set(AD5940_PIN_CS);
 }
