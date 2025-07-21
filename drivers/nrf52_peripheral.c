@@ -9,23 +9,20 @@
 
 #define ADC_NODE        DT_NODELABEL(adc) // 适用于大多数 nRF52 板卡
 #define ADC_RESOLUTION  12
-#define ADC_CHANNEL_ID  1 // 你的ADC通道号
-#define ADC_INPUT       NRF_SAADC_INPUT_AIN1 // 你的ADC输入引脚
+#define ADC_CHANNEL_ID  1 // ADC通道号
+#define ADC_INPUT       NRF_SAADC_INPUT_AIN1 // ADC输入引脚
 
-#define DAC_SPI_NODE DT_NODELABEL(spi1) // 你的 SPI 实例
+#define DAC_SPI_NODE DT_NODELABEL(spi1) //  SPI 实例
 #define DAC_CS_PIN   15 // 片选引脚
 #define DAC_LOAD_PIN 21 // DAC_LOAD
-#define DAC_ENA_PIN  22 // DAC_ENA
+#define DAC_ENA_PIN  20 // DAC_ENA
 #define GPIO_PORT    DT_LABEL(DT_NODELABEL(gpio0))
 
-// ADC 初始化（只需初始化一次）
+// ADC 初始化   只需一次
 static void saadc_init(void)
 {
     static int initialized = 0;
     if (initialized) return;
-    // nrf_drv_saadc_init(NULL, NULL); // 删除
-    // nrf_saadc_channel_config_t channel_config = NRF_DRV_SAADC_DEFAULT_CHANNEL_CONFIG_SE(NRF_SAADC_INPUT_AIN0); // 删除
-    // nrf_drv_saadc_channel_init(0, &channel_config); // 删除
     initialized = 1;
 }
 

@@ -23,7 +23,7 @@ void main(void)
 {
   int err = 0;
   // AD5940改成nrf52832
-  err = nrf52_spi_init();
+  err = AD5940_spi_init();
   if (err)
   {
     LOG_ERR("nrf52 SPI init failed (err %d)", err);

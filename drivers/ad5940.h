@@ -16,6 +16,7 @@
 #include "math.h"
 #include "string.h"
 #include "stdio.h"
+#include "ad5940_platform.h"  //新添加
 /** @addtogroup AD5940_Library
   * @{
   */
@@ -2104,7 +2105,7 @@
 #define BITM_AFE_BUFSENCON_V1P8THERMSTEN     0x00000100    /*  Buffered Reference Output */
 #define BITM_AFE_BUFSENCON_V1P1LPADCCHGDIS   0x00000040    /*  Controls Decoupling Cap Discharge Switch */
 #define BITM_AFE_BUFSENCON_V1P1LPADCEN       0x00000020    /*  ADC 1.1V LP Buffer */
-#define BITM_AFE_BUFSENCON_V1P1HPADCEN       0x00000010    /*  Enable 1.1V HP CM Buffer */
+#define BITM_AFE_BUFSENCON_V1P1HPADCEN       0x00000010    /*  Enable 1.1V HP Common Mode Buffer */
 #define BITM_AFE_BUFSENCON_V1P8HPADCCHGDIS   0x00000008    /*  Controls Decoupling Cap Discharge Switch */
 #define BITM_AFE_BUFSENCON_V1P8LPADCEN       0x00000004    /*  ADC 1.8V LP Reference Buffer */
 #define BITM_AFE_BUFSENCON_V1P8HPADCILIMITEN 0x00000002    /*  HP ADC Input Current Limit */
@@ -2657,142 +2658,6 @@
 #define BITM_INTC_INTCCLR_INTCLR10           0x00000400    /*  Custom IRQ 1. Write 1 to clear. */
 #define BITM_INTC_INTCCLR_INTCLR9            0x00000200    /*  Custom IRQ 0. Write 1 to clear */
 #define BITM_INTC_INTCCLR_INTCLR8            0x00000100
-#define BITM_INTC_INTCCLR_INTCLR7            0x00000080
-#define BITM_INTC_INTCCLR_INTCLR6            0x00000040
-#define BITM_INTC_INTCCLR_INTCLR5            0x00000020
-#define BITM_INTC_INTCCLR_INTCLR4            0x00000010
-#define BITM_INTC_INTCCLR_INTCLR3            0x00000008
-#define BITM_INTC_INTCCLR_INTCLR2            0x00000004
-#define BITM_INTC_INTCCLR_INTCLR1            0x00000002
-#define BITM_INTC_INTCCLR_INTCLR0            0x00000001
-
-/* -------------------------------------------------------------------------------------------------------------------------
-          INTC_INTCSEL0                        Pos/Masks         Description
-   ------------------------------------------------------------------------------------------------------------------------- */
-#define BITP_INTC_INTCSEL0_INTSEL31          31
-#define BITP_INTC_INTCSEL0_INTSEL30          30
-#define BITP_INTC_INTCSEL0_INTSEL29          29
-#define BITP_INTC_INTCSEL0_INTSEL28          28
-#define BITP_INTC_INTCSEL0_INTSEL27          27
-#define BITP_INTC_INTCSEL0_INTSEL26          26
-#define BITP_INTC_INTCSEL0_INTSEL25          25
-#define BITP_INTC_INTCSEL0_INTSEL24          24
-#define BITP_INTC_INTCSEL0_INTSEL23          23
-#define BITP_INTC_INTCSEL0_INTSEL22          22
-#define BITP_INTC_INTCSEL0_INTSEL21          21
-#define BITP_INTC_INTCSEL0_INTSEL20          20
-#define BITP_INTC_INTCSEL0_INTSEL19          19
-#define BITP_INTC_INTCSEL0_INTSEL18          18
-#define BITP_INTC_INTCSEL0_INTSEL17          17
-#define BITP_INTC_INTCSEL0_INTSEL16          16
-#define BITP_INTC_INTCSEL0_INTSEL15          15
-#define BITP_INTC_INTCSEL0_INTSEL14          14
-#define BITP_INTC_INTCSEL0_INTSEL13          13
-#define BITP_INTC_INTCSEL0_INTSEL12          12            /*  Custom IRQ 3 Enable */
-#define BITP_INTC_INTCSEL0_INTSEL11          11            /*  Custom IRQ 2 Enable */
-#define BITP_INTC_INTCSEL0_INTSEL10          10            /*  Custom IRQ 1 Enable */
-#define BITP_INTC_INTCSEL0_INTSEL9            9            /*  Custom IRQ 0 Enable */
-#define BITP_INTC_INTCSEL0_INTSEL8            8
-#define BITP_INTC_INTCSEL0_INTSEL7            7
-#define BITP_INTC_INTCSEL0_INTSEL6            6
-#define BITP_INTC_INTCSEL0_INTSEL5            5
-#define BITP_INTC_INTCSEL0_INTSEL4            4
-#define BITP_INTC_INTCSEL0_INTSEL3            3
-#define BITP_INTC_INTCSEL0_INTSEL2            2
-#define BITP_INTC_INTCSEL0_INTSEL1            1
-#define BITP_INTC_INTCSEL0_INTSEL0            0
-#define BITM_INTC_INTCSEL0_INTSEL31          0x80000000
-#define BITM_INTC_INTCSEL0_INTSEL30          0x40000000
-#define BITM_INTC_INTCSEL0_INTSEL29          0x20000000
-#define BITM_INTC_INTCSEL0_INTSEL28          0x10000000
-#define BITM_INTC_INTCSEL0_INTSEL27          0x08000000
-#define BITM_INTC_INTCSEL0_INTSEL26          0x04000000
-#define BITM_INTC_INTCSEL0_INTSEL25          0x02000000
-#define BITM_INTC_INTCSEL0_INTSEL24          0x01000000
-#define BITM_INTC_INTCSEL0_INTSEL23          0x00800000
-#define BITM_INTC_INTCSEL0_INTSEL22          0x00400000
-#define BITM_INTC_INTCSEL0_INTSEL21          0x00200000
-#define BITM_INTC_INTCSEL0_INTSEL20          0x00100000
-#define BITM_INTC_INTCSEL0_INTSEL19          0x00080000
-#define BITM_INTC_INTCSEL0_INTSEL18          0x00040000
-#define BITM_INTC_INTCSEL0_INTSEL17          0x00020000
-#define BITM_INTC_INTCSEL0_INTSEL16          0x00010000
-#define BITM_INTC_INTCSEL0_INTSEL15          0x00008000
-#define BITM_INTC_INTCSEL0_INTSEL14          0x00004000
-#define BITM_INTC_INTCSEL0_INTSEL13          0x00002000
-#define BITM_INTC_INTCSEL0_INTSEL12          0x00001000    /*  Custom IRQ 3 Enable */
-#define BITM_INTC_INTCSEL0_INTSEL11          0x00000800    /*  Custom IRQ 2 Enable */
-#define BITM_INTC_INTCSEL0_INTSEL10          0x00000400    /*  Custom IRQ 1 Enable */
-#define BITM_INTC_INTCSEL0_INTSEL9           0x00000200    /*  Custom IRQ 0 Enable */
-#define BITM_INTC_INTCSEL0_INTSEL8           0x00000100
-#define BITM_INTC_INTCSEL0_INTSEL7           0x00000080
-#define BITM_INTC_INTCSEL0_INTSEL6           0x00000040
-#define BITM_INTC_INTCSEL0_INTSEL5           0x00000020
-#define BITM_INTC_INTCSEL0_INTSEL4           0x00000010
-#define BITM_INTC_INTCSEL0_INTSEL3           0x00000008
-#define BITM_INTC_INTCSEL0_INTSEL2           0x00000004
-#define BITM_INTC_INTCSEL0_INTSEL1           0x00000002
-#define BITM_INTC_INTCSEL0_INTSEL0           0x00000001
-
-/* -------------------------------------------------------------------------------------------------------------------------
-          INTC_INTCSEL1                        Pos/Masks         Description
-   ------------------------------------------------------------------------------------------------------------------------- */
-#define BITP_INTC_INTCSEL1_INTSEL31          31
-#define BITP_INTC_INTCSEL1_INTSEL30          30
-#define BITP_INTC_INTCSEL1_INTSEL29          29
-#define BITP_INTC_INTCSEL1_INTSEL28          28
-#define BITP_INTC_INTCSEL1_INTSEL27          27
-#define BITP_INTC_INTCSEL1_INTSEL26          26
-#define BITP_INTC_INTCSEL1_INTSEL25          25
-#define BITP_INTC_INTCSEL1_INTSEL24          24
-#define BITP_INTC_INTCSEL1_INTSEL23          23
-#define BITP_INTC_INTCSEL1_INTSEL22          22
-#define BITP_INTC_INTCSEL1_INTSEL21          21
-#define BITP_INTC_INTCSEL1_INTSEL20          20
-#define BITP_INTC_INTCSEL1_INTSEL19          19
-#define BITP_INTC_INTCSEL1_INTSEL18          18
-#define BITP_INTC_INTCSEL1_INTSEL17          17
-#define BITP_INTC_INTCSEL1_INTSEL16          16
-#define BITP_INTC_INTCSEL1_INTSEL15          15
-#define BITP_INTC_INTCSEL1_INTSEL14          14
-#define BITP_INTC_INTCSEL1_INTSEL13          13
-#define BITP_INTC_INTCSEL1_INTSEL12          12            /*  Custom IRQ 3 Enable */
-#define BITP_INTC_INTCSEL1_INTSEL11          11            /*  Custom IRQ 2 Enable */
-#define BITP_INTC_INTCSEL1_INTSEL10          10            /*  Custom IRQ 1 Enable */
-#define BITP_INTC_INTCSEL1_INTSEL9            9            /*  Custom IRQ 0 Enable */
-#define BITP_INTC_INTCSEL1_INTSEL8            8
-#define BITP_INTC_INTCSEL1_INTSEL7            7
-#define BITP_INTC_INTCSEL1_INTSEL6            6
-#define BITP_INTC_INTCSEL1_INTSEL5            5
-#define BITP_INTC_INTCSEL1_INTSEL4            4
-#define BITP_INTC_INTCSEL1_INTSEL3            3
-#define BITP_INTC_INTCSEL1_INTSEL2            2
-#define BITP_INTC_INTCSEL1_INTSEL1            1
-#define BITP_INTC_INTCSEL1_INTSEL0            0
-#define BITM_INTC_INTCSEL1_INTSEL31          0x80000000
-#define BITM_INTC_INTCSEL1_INTSEL30          0x40000000
-#define BITM_INTC_INTCSEL1_INTSEL29          0x20000000
-#define BITM_INTC_INTCSEL1_INTSEL28          0x10000000
-#define BITM_INTC_INTCSEL1_INTSEL27          0x08000000
-#define BITM_INTC_INTCSEL1_INTSEL26          0x04000000
-#define BITM_INTC_INTCSEL1_INTSEL25          0x02000000
-#define BITM_INTC_INTCSEL1_INTSEL24          0x01000000
-#define BITM_INTC_INTCSEL1_INTSEL23          0x00800000
-#define BITM_INTC_INTCSEL1_INTSEL22          0x00400000
-#define BITM_INTC_INTCSEL1_INTSEL21          0x00200000
-#define BITM_INTC_INTCSEL1_INTSEL20          0x00100000
-#define BITM_INTC_INTCSEL1_INTSEL19          0x00080000
-#define BITM_INTC_INTCSEL1_INTSEL18          0x00040000
-#define BITM_INTC_INTCSEL1_INTSEL17          0x00020000
-#define BITM_INTC_INTCSEL1_INTSEL16          0x00010000
-#define BITM_INTC_INTCSEL1_INTSEL15          0x00008000
-#define BITM_INTC_INTCSEL1_INTSEL14          0x00004000
-#define BITM_INTC_INTCSEL1_INTSEL13          0x00002000
-#define BITM_INTC_INTCSEL1_INTSEL12          0x00001000    /*  Custom IRQ 3 Enable */
-#define BITM_INTC_INTCSEL1_INTSEL11          0x00000800    /*  Custom IRQ 2 Enable */
-#define BITM_INTC_INTCSEL1_INTSEL10          0x00000400    /*  Custom IRQ 1 Enable */
-#define BITM_INTC_INTCSEL1_INTSEL9           0x00000200    /*  Custom IRQ 0 Enable */
-#define BITM_INTC_INTCSEL1_INTSEL8           0x00000100
 #define BITM_INTC_INTCSEL1_INTSEL7           0x00000080
 #define BITM_INTC_INTCSEL1_INTSEL6           0x00000040
 #define BITM_INTC_INTCSEL1_INTSEL5           0x00000020
@@ -3493,10 +3358,6 @@
 #define LPTIARTIA_64K               17  /**< 64KOHM */
 #define LPTIARTIA_85K               18  /**< 85KOHM */
 #define LPTIARTIA_96K               19  /**< 96KOHM */
-#define LPTIARTIA_100K              20  /**< 100KOHM */
-#define LPTIARTIA_120K              21  /**< 120KOHM */
-#define LPTIARTIA_128K              22  /**< 128KOHM */
-#define LPTIARTIA_160K              23  /**< 160KOHM */
 #define LPTIARTIA_196K              24  /**< 196KOHM */
 #define LPTIARTIA_256K              25  /**< 256KOHM */
 #define LPTIARTIA_512K              26  /**< 512KOHM */
@@ -4937,3 +4798,8 @@ uint32_t  AD5940_MCUResourceInit(void *pCfg);
   */
 
 #endif
+#define BITP_AFE_BUFSENCON_V1P1LPADCCHGDIS    6            /*  Controls Decoupling Cap Discharge Switch */
+#define BITP_AFE_BUFSENCON_V1P1LPADCEN        5            /*  ADC 1.1V LP Buffer */
+#define BITP_AFE_BUFSENCON_V1P1HPADCEN        4            /*  Enable 1.1V HP CM Buffer */
+#define BITP_AFE_BUFSENCON_V1P8HPADCCHGDIS    3            /*  Controls Decoupling Cap Discharge Switch */
+#define BITP_AFE_BUFSENCON_V1P8LPADCEN        2            /*  ADC 1.8V LP Reference Buffer */
